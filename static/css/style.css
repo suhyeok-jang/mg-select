@@ -83,7 +83,7 @@ body {
 
 /* ── TL;DR box ──────────────────────────────────────────────── */
 .tldr-section {
-  padding: 0.5rem 1.5rem 2rem;  /* tight against Hero above */
+  padding: 0 1.5rem 0.8rem;  /* tighter top/bottom */
 }
 .tldr-box {
   background: linear-gradient(135deg, #f0f7f7 0%, #fafbfc 100%);
@@ -116,7 +116,7 @@ body {
 
 /* ── Teaser image (below TL;DR) ─────────────────────────────── */
 .teaser-section {
-  padding: 1rem 1.5rem 2rem;
+  padding: 0.5rem 1.5rem 1.5rem;
 }
 .teaser-img {
   width: 100%;
