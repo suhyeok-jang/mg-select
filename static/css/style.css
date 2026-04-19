@@ -345,9 +345,16 @@ body {
   color: #4a4a4a;
   margin: 1.5rem 0 0.3rem;
 }
-.bench-caption {
-  margin-bottom: 1rem;
+ul.bench-caption {
+  margin: 0 0 1rem 0;
+  padding-left: 1.4rem;
   line-height: 1.7;
+  list-style-type: disc !important;
+  list-style-position: outside;
+}
+ul.bench-caption li {
+  display: list-item !important;
+  margin-bottom: 0.4rem;
 }
 .table-footnote {
   font-size: 0.78rem;
