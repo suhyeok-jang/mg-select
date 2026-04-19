@@ -27,18 +27,19 @@ body {
 /* ── Hero / title block ─────────────────────────────────────── */
 .venue-badge {
   display: inline-block;
-  padding: 0.35rem 0.9rem;
-  margin-bottom: 1.5rem;
-  font-size: 0.85rem;
+  padding: 0.55rem 1.3rem;
+  margin-bottom: 1.75rem;
+  font-size: 1.05rem;
   border-radius: 999px;
-  background: #f1f3f5;
-  color: #4a4a4a;
+  background: #eaf5f5;
+  color: #1f4f50;
   font-family: 'Google Sans', sans-serif;
   letter-spacing: 0.02em;
+  border: 1px solid #c3dddd;
 }
 .venue-badge strong {
   color: #2c7a7b;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .publication-authors {
@@ -75,9 +76,14 @@ body {
   color: #fff;
 }
 
+/* Reduce hero bottom padding so TL;DR sits closer */
+.hero-tight .hero-body {
+  padding-bottom: 1.5rem;
+}
+
 /* ── TL;DR box ──────────────────────────────────────────────── */
 .tldr-section {
-  padding: 2rem 1.5rem;
+  padding: 0.5rem 1.5rem 2rem;  /* tight against Hero above */
 }
 .tldr-box {
   background: linear-gradient(135deg, #f0f7f7 0%, #fafbfc 100%);
@@ -108,11 +114,30 @@ body {
   vertical-align: middle;
 }
 
-/* ── Main / teaser figure ───────────────────────────────────── */
+/* ── Teaser image (below TL;DR) ─────────────────────────────── */
+.teaser-section {
+  padding: 1rem 1.5rem 2rem;
+}
+.teaser-img {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* ── Main figure (inline in method) ─────────────────────────── */
 .main-figure img {
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
   max-width: 100%;
+}
+.fig-img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #fff;
 }
 .figure-caption {
   margin-top: 1rem;
@@ -238,7 +263,7 @@ body {
 .eq-body {
   flex: 1;
   min-width: 0;
-  overflow-x: auto;
+  overflow-x: visible;
 }
 .equation-center {
   text-align: center;
@@ -305,6 +330,18 @@ body {
   font-size: 0.92rem;
   color: #4a4a4a;
   margin: 1.5rem 0 0.3rem;
+}
+.bench-caption {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+.table-footnote {
+  font-size: 0.78rem;
+  color: #8a8a8a;
+  font-family: 'Google Sans', sans-serif;
+  text-align: right;
+  margin: 0.3rem 0 0;
+  font-style: italic;
 }
 
 /* ── Efficiency grid (Figure 3 + Table 5(b)) ───────────────── */
@@ -391,12 +428,13 @@ body {
   object-fit: cover;
 }
 
-.qual-footnote {
+.qual-caption {
   text-align: center;
-  font-size: 0.8rem;
-  color: #8a8a8a;
-  font-family: 'Google Sans', sans-serif;
-  margin-top: 1.5rem;
+  max-width: 760px;
+  margin: 1.8rem auto 0;
+  font-size: 0.95rem;
+  color: #4a4a4a;
+  line-height: 1.6;
 }
 
 @media (max-width: 900px) {

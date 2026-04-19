@@ -45,7 +45,7 @@
 <!-- =============================================================
      1. Hero / Title
      ============================================================= -->
-<section class="hero">
+<section class="hero hero-tight">
   <div class="hero-body">
     <div class="container is-max-desktop">
       <div class="columns is-centered">
@@ -123,6 +123,17 @@
 </section>
 
 <!-- =============================================================
+     2b. Teaser (Figure 1)
+     ============================================================= -->
+<section class="section teaser-section">
+  <div class="container is-max-desktop has-text-centered">
+    <img src="static/images/teaser.png"
+         alt="Overview of MG-Select"
+         class="teaser-img">
+  </div>
+</section>
+
+<!-- =============================================================
      3. Abstract
      ============================================================= -->
 <section class="section">
@@ -135,7 +146,7 @@
             Vision-Language-Action models (VLAs) excel at robot control but their <em>single-inference</em>, greedy-decoding paradigm bottlenecks high-precision manipulation. Existing test-time scaling approaches rely on <em>external verifiers</em> that require additional training and fail to generalize to unseen conditions.
           </p>
           <p>
-            We propose <span class="mgselect">Masking Distribution Guided Selection (MG-Select)</span>, a verifier-free test-time scaling framework that uses KL divergence from a <strong>condition-masking reference distribution</strong> — produced by the same VLA with randomly masked states and language conditions — as a Best-of-N confidence signal. A joint training strategy that applies dropout to state and language conditions further sharpens the reference at test time.
+            We propose <span class="mgselect">Masking Distribution Guided Selection (MG-Select)</span>, a verifier-free test-time scaling framework that uses KL divergence from a <strong>condition-masking reference distribution</strong> as a Best-of-N confidence signal. The reference is produced by the same VLA with randomly masked states and language conditions. A joint training strategy that applies dropout to state and language conditions further sharpens the reference at test time.
           </p>
           <p>
             Our experiments demonstrate that <span class="mgselect">MG-Select</span> consistently improves state-of-the-art VLAs across diverse simulation and real-world pick-and-place benchmarks, <em>without any additional training or external module</em> at inference.
@@ -173,8 +184,7 @@
         <div class="stat-card">
           <div class="stat-number">+28%</div>
           <div class="stat-label">
-            Real-world in-distribution tasks<br>
-            Franka Research 3, 4 objects
+            Real-world in-distribution tasks
           </div>
         </div>
       </div>
@@ -182,8 +192,7 @@
         <div class="stat-card">
           <div class="stat-number">+35%</div>
           <div class="stat-label">
-            Real-world out-of-distribution tasks<br>
-            Unseen objects
+            Real-world out-of-distribution tasks
           </div>
         </div>
       </div>
@@ -205,13 +214,13 @@
           <p class="step-title">1.&ensp;Motivation</p>
           <div class="content has-text-justified">
             <p>
-              VLAs have shown remarkable performance in robot control, yet they remain fundamentally limited on tasks that demand high precision &mdash; even after extensive pre-training, they often fail on fine-grained manipulation such as grasping or object placement. This precision gap is especially problematic for real-world applications where <em>millimeter-level accuracy</em> can decide task success.
+              VLAs have shown remarkable performance in robot control, yet they remain fundamentally limited on tasks that demand high precision. Even after extensive pre-training, they often fail on fine-grained manipulation such as grasping or object placement. This precision gap is especially problematic for real-world applications where <em>millimeter-level accuracy</em> can decide task success.
             </p>
             <p>
               A natural remedy, inspired by Test-Time Scaling (TTS) in LLMs, is <em>repeated sampling + Best-of-N selection</em>. Prior work pairs sampling with an <strong>external verifier</strong> trained via reinforcement learning on robotic data, which introduces two significant drawbacks: (i) it adds substantial training cost and deployment complexity, and (ii) the learned verifiers fail to generalize to unseen task prompts or objects, limiting broader applicability.
             </p>
             <p>
-              Our goal is therefore a TTS framework that leverages the <strong>model's internal properties</strong> &mdash; no extra training, no external modules.
+              Our goal is therefore a TTS framework that leverages the <strong>model's internal properties</strong>, with no extra training and no external modules.
             </p>
           </div>
         </div>
@@ -219,23 +228,12 @@
         <!-- 5.2 Condition-Masking Distributional Confidence -->
         <div class="method-step">
           <p class="step-title">2.&ensp;Condition-Masking Distributional Confidence</p>
-
-          <figure class="main-figure has-text-centered">
-            <div class="placeholder-image">
-              <span class="placeholder-label">Figure 1 — Overview of MG-Select</span>
-              <span class="placeholder-hint">(static/images/teaser.png)</span>
-            </div>
-            <figcaption class="figure-caption">
-              <strong>Overview of <span class="mgselect">MG-Select</span>.</strong> (1) An autoregressive VLA $\pi_\theta$ samples action tokens in parallel from the predicted distribution, while simultaneously computing token-wise KL divergence from the <em>condition-masking</em> distribution. (2) Best-of-N selection is performed using an action confidence score $C_{\tilde{a}}$ obtained by aggregating these token-wise scores.
-            </figcaption>
-          </figure>
-
           <div class="content has-text-justified">
             <p>
-              Naive likelihood-based Best-of-N often fails because VLAs fine-tuned on the target task produce <em>overly concentrated</em> action token distributions &mdash; multiple samples collapse to the same action. Instead, we compute a confidence score via the <strong>KL divergence</strong> between the predicted distribution and a <strong>reference distribution that represents uncertainty</strong>. Intuitively, actions that deviate most from an uncertainty-aware reference are the most confident.
+              Naive likelihood-based Best-of-N often fails because VLAs fine-tuned on the target task produce <em>overly concentrated</em> action token distributions, causing multiple samples to collapse to the same action. Instead, we compute a confidence score via the <strong>KL divergence</strong> between the predicted distribution and a <strong>reference distribution that represents uncertainty</strong>. Intuitively, actions that deviate most from an uncertainty-aware reference are the most confident.
             </p>
             <p>
-              We build that reference using the same VLA, but with specific input modalities masked &mdash; approximating failure modes where essential conditions are ignored. We consider three variants:
+              We build that reference using the same VLA, but with specific input modalities masked, approximating failure modes where essential conditions are ignored. We consider three variants:
             </p>
             <div class="equation-block">
               <div class="eq-row">
@@ -255,7 +253,7 @@
               Token-wise KL is aggregated into an action-level confidence $C_{\tilde{a}} = \sum_{i \in \mathcal{I}} \mathrm{KL}(Q_i \,\|\, P_i)$, and the final action is selected via Best-of-N:
             </p>
             <div class="equation-center">
-              $a^{\*} = \arg\max_{\tilde{a}^{(n)} \in \tilde{\mathcal{A}}} C_{\tilde{a}^{(n)}}$
+              $a^{\ast} = \arg\max_{\tilde{a}^{(n)} \in \tilde{\mathcal{A}}} C_{\tilde{a}^{(n)}}$
             </div>
             <p>
               The optimal masking variant depends on the environment: <em>state-masking</em> works best on benchmarks that are single-task pick-and-place (e.g., SIMPLER-WidowX), while <em>text-masking</em> dominates on multi-task environments (e.g., RoboCasa) where instructions are indispensable.
@@ -277,7 +275,7 @@
               <span class="variant-chip">(iv) both-masking $(\varnothing, \varnothing)$</span>
             </div>
             <p>
-              Dropout over $q_t$ and $I$ is applied during training. The resulting VLA &mdash; denoted <strong><span class="mgselect">MG-Select</span>*</strong> &mdash; matches standard-fine-tuning performance <em>and</em> produces meaningful condition-masking references at test time, yielding a stronger confidence signal and further amplifying MG-Select's gains.
+              Dropout over $q_t$ and $I$ is applied during training. The resulting VLA, denoted <strong><span class="mgselect">MG-Select</span>*</strong>, matches standard-fine-tuning performance <em>and</em> produces meaningful condition-masking references at test time, yielding a stronger confidence signal and further amplifying MG-Select's gains.
             </p>
           </div>
         </div>
@@ -292,9 +290,6 @@
 <section class="section has-background-light">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Qualitative Results</h2>
-    <p class="content has-text-centered" style="max-width:760px; margin:0 auto 2rem;">
-      Real-world <em>"Box to Bowl"</em> task on the Franka Research 3. <span class="mgselect">MG-Select</span> produces high-precision actions at the <strong>critical moments</strong> &mdash; grasping and releasing &mdash; where the base policy often fails.
-    </p>
 
     <div class="qual-stage">
 
@@ -347,8 +342,8 @@
 
     </div>
 
-    <p class="qual-footnote">
-      Each clip shows a wide-view (left) and a wrist-camera close-up (right). Videos auto-play muted and loop.
+    <p class="qual-caption">
+      Real-world <em>"Box to Bowl"</em> task on the Franka Research 3. <span class="mgselect">MG-Select</span> produces high-precision actions at the critical moments, grasping and releasing, where the base policy often fails.
     </p>
   </div>
 </section>
@@ -366,25 +361,24 @@
             Since <span class="mgselect">MG-Select</span> generates $N$ candidate actions in parallel, a naive implementation repeats the expensive <em>prefill</em> step $N$ times. This is particularly critical for VLAs, which re-prefill at every timestep to condition on the current observation.
           </p>
           <p>
-            We design a <strong>single-prefill deployment</strong> that shares one prefill across all $N$ candidates before decoding. With $N=4$, this gives a <strong>45% latency reduction</strong> compared to vanilla MG-Select &mdash; keeping inference time comparable to single-action inference across different candidate sizes.
+            We design a <strong>single-prefill deployment</strong> that shares one prefill across all $N$ candidates before decoding. With $N=4$, this gives a <strong>45% latency reduction</strong> compared to vanilla MG-Select, keeping inference time comparable to single-action inference across different candidate sizes.
           </p>
         </div>
 
         <div class="efficiency-grid">
-          <!-- Left: Latency figure placeholder -->
+          <!-- Left: Latency figure -->
           <figure>
-            <div class="placeholder-image">
-              <span class="placeholder-label">Figure 3 — Inference latency on LIBERO-Object</span>
-              <span class="placeholder-hint">(static/images/latency.png)</span>
-            </div>
+            <img src="static/images/latency.png"
+                 alt="Inference latency comparison on LIBERO-Object"
+                 class="fig-img">
             <figcaption class="figure-caption">
-              <span class="mgselect">MG-Select</span> + single prefill stays near-flat as $N$ grows, while vanilla <span class="mgselect">MG-Select</span> scales super-linearly.
+              <strong>Figure 3.</strong> Inference latency on LIBERO-Object. <span class="mgselect">MG-Select</span> with single prefill stays near-flat as $N$ grows, while vanilla <span class="mgselect">MG-Select</span> scales super-linearly.
             </figcaption>
           </figure>
 
-          <!-- Right: Table 5(b) — Number of candidates -->
+          <!-- Right: Table 5(b), Number of candidates -->
           <div>
-            <p class="result-caption"><strong>Table 5 (b)</strong> — Effect of candidate count $N$ on RoboCasa (100 demos). Gains saturate quickly: $N=4$ already captures most of the improvement.</p>
+            <p class="result-caption"><strong>Table 5 (b).</strong> Effect of candidate count $N$ on RoboCasa (100 demos). Gains saturate quickly, and $N=4$ already captures most of the improvement.</p>
             <div class="table-wrap">
               <table class="results-table compact">
                 <thead>
@@ -420,15 +414,16 @@
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Benchmark Results</h2>
     <p class="content has-text-centered" style="margin-bottom:2rem; max-width:720px; margin-left:auto; margin-right:auto;">
-      <span class="mgselect">MG-Select</span> consistently improves state-of-the-art VLAs across <strong>simulation</strong>, <strong>real-world Franka experiments</strong>, a <strong>real-to-sim</strong> evaluation, and a <strong>long-horizon zero-shot</strong> benchmark &mdash; all without any external verifier.
+      <span class="mgselect">MG-Select</span> consistently improves state-of-the-art VLAs across <strong>simulation</strong>, <strong>real-world Franka experiments</strong>, a <strong>real-to-sim</strong> evaluation, and a <strong>long-horizon zero-shot</strong> benchmark, all without any external verifier.
     </p>
 
     <!-- (1) RoboCasa -->
     <div class="columns is-centered">
       <div class="column is-four-fifths">
-        <h3 class="title is-4">(1)&ensp;RoboCasa &mdash; pick-and-place precision</h3>
-        <p class="content has-text-justified" style="margin-bottom:1rem;">
-          24 atomic household kitchen tasks (including 8 pick-and-place) across 3 demonstration scales. <span class="mgselect">MG-Select</span>* produces the largest gains in the <strong>low-data regime</strong>: +168% relative at 30 demos on PnP.
+        <h3 class="title is-4">(1)&ensp;RoboCasa, pick-and-place precision</h3>
+        <p class="content has-text-justified bench-caption">
+          <strong>Setup.</strong> 8 pick-and-place tasks (of 24 kitchen tasks), trained with 30, 100, and 300 demonstrations.<br>
+          <strong>Effect.</strong> <span class="mgselect">MG-Select</span>* yields the largest gains in the low-data regime, +168% relative on PnP at 30 demos.
         </p>
         <div class="table-wrap">
           <table class="results-table">
@@ -472,6 +467,7 @@
               </tr>
             </tbody>
           </table>
+          <p class="table-footnote">* denotes additional joint training before test-time scaling.</p>
         </div>
       </div>
     </div>
@@ -479,12 +475,13 @@
     <!-- (2) Real-World -->
     <div class="columns is-centered">
       <div class="column is-four-fifths">
-        <h3 class="title is-4">(2)&ensp;Real-World &mdash; Franka Research 3</h3>
-        <p class="content has-text-justified" style="margin-bottom:1rem;">
-          We evaluate on a 7-DoF Franka arm using &pi;<sub>0</sub>-FAST-DROID as the base model, testing both <strong>in-distribution</strong> pick-and-place (4 seen objects) and <strong>out-of-distribution</strong> (unseen tape and cup) tasks.
+        <h3 class="title is-4">(2)&ensp;Real-World, Franka Research 3</h3>
+        <p class="content has-text-justified bench-caption">
+          <strong>Setup.</strong> 7-DoF Franka arm with &pi;<sub>0</sub>-FAST-DROID, tested on in-distribution (seen objects) and out-of-distribution (unseen objects) pick-and-place tasks.<br>
+          <strong>Effect.</strong> <span class="mgselect">MG-Select</span>* gives +28% on ID tasks and +35% on OOD tasks, confirming real-world gains beyond simulation.
         </p>
 
-        <p class="result-caption"><strong>Table 4</strong> &mdash; In-distribution: multi-task training with 60 demonstrations per task. 24 trials (4 objects × 6 trials) per task.</p>
+        <p class="result-caption"><strong>Table 4.</strong> In-distribution: 60 demos per task, 24 trials (4 objects × 6 trials) per task.</p>
         <div class="table-wrap">
           <table class="results-table">
             <thead>
@@ -508,9 +505,10 @@
               </tr>
             </tbody>
           </table>
+          <p class="table-footnote">* denotes additional joint training before test-time scaling.</p>
         </div>
 
-        <p class="result-caption"><strong>Table 3</strong> &mdash; Out-of-distribution: unseen objects (16 trials per task).</p>
+        <p class="result-caption"><strong>Table 3.</strong> Out-of-distribution: unseen objects, 16 trials per task.</p>
         <div class="table-wrap">
           <table class="results-table">
             <thead>
@@ -539,9 +537,10 @@
     <!-- (3) SIMPLER-WidowX -->
     <div class="columns is-centered">
       <div class="column is-four-fifths">
-        <h3 class="title is-4">(3)&ensp;SIMPLER-WidowX &mdash; real-to-sim evaluation</h3>
-        <p class="content has-text-justified" style="margin-bottom:1rem;">
-          4 pick-and-place tasks in a real-to-sim setting. We train &pi;<sub>0</sub>-FAST on BridgeData V2 and evaluate on SIMPLER. <span class="mgselect">MG-Select</span>* improves average success rate from 46.9 to <strong>50.3</strong>, outperforming prior VLAs on average.
+        <h3 class="title is-4">(3)&ensp;SIMPLER-WidowX, real-to-sim evaluation</h3>
+        <p class="content has-text-justified bench-caption">
+          <strong>Setup.</strong> &pi;<sub>0</sub>-FAST trained on BridgeData V2, evaluated on 4 SIMPLER pick-and-place tasks in a real-to-sim setting.<br>
+          <strong>Effect.</strong> <span class="mgselect">MG-Select</span>* raises average success from 46.9 to <strong>50.3</strong>, the highest among all compared VLAs.
         </p>
         <div class="table-wrap">
           <table class="results-table">
@@ -570,6 +569,7 @@
               </tr>
             </tbody>
           </table>
+          <p class="table-footnote">* denotes additional joint training before test-time scaling.</p>
         </div>
       </div>
     </div>
@@ -577,9 +577,10 @@
     <!-- (4) CALVIN -->
     <div class="columns is-centered">
       <div class="column is-four-fifths">
-        <h3 class="title is-4">(4)&ensp;CALVIN &mdash; long-horizon zero-shot generalization</h3>
-        <p class="content has-text-justified" style="margin-bottom:1rem;">
-          CALVIN evaluates <strong>long-horizon, multi-step planning</strong> on a Franka Panda arm across 34 language-conditioned tasks. We train &pi;<sub>0</sub>-FAST on environments A/B/C and <em>zero-shot</em> evaluate on the novel environment D (ABC&rarr;D), running 1,000 instruction chains. <span class="mgselect">MG-Select</span>* improves success at every chain depth, yielding a higher average chain length (3.69 &rarr; <strong>3.86</strong>).
+        <h3 class="title is-4">(4)&ensp;CALVIN, long-horizon zero-shot generalization</h3>
+        <p class="content has-text-justified bench-caption">
+          <strong>Setup.</strong> &pi;<sub>0</sub>-FAST trained on environments A, B, and C, zero-shot evaluated on novel environment D (ABC&rarr;D) over 1,000 instruction chains across 34 tasks.<br>
+          <strong>Effect.</strong> <span class="mgselect">MG-Select</span>* improves success at every chain depth (1&ndash;5 steps), raising average chain length from 3.69 to <strong>3.86</strong>.
         </p>
         <div class="table-wrap">
           <table class="results-table">
@@ -609,6 +610,7 @@
               </tr>
             </tbody>
           </table>
+          <p class="table-footnote">* denotes additional joint training before test-time scaling.</p>
         </div>
       </div>
     </div>
