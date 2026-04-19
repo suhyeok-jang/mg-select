@@ -1,20 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="description"
+        content="MG-Select: A verifier-free test-time scaling framework for Vision-Language-Action models that uses condition-masking distributional confidence for Best-of-N action selection.">
+  <meta name="keywords" content="MG-Select, VLA, Vision-Language-Action, Test-Time Scaling, Robot Manipulation, ICLR 2026">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>MG-Select: Verifier-free Test-Time Sampling for Vision-Language-Action Models</title>
-  <meta name="description" content="MG-Select is a verifier-free test-time scaling framework for Vision-Language-Action models that uses condition-masking distributional confidence for Best-of-N action selection.">
 
   <!-- Open Graph -->
   <meta property="og:title" content="MG-Select: Verifier-free Test-Time Sampling for VLAs">
-  <meta property="og:description" content="A test-time scaling framework for Vision-Language-Action models that requires no external verifier.">
+  <meta property="og:description" content="A masking distribution-guided test-time scaling method that improves VLA precision without external verifiers.">
   <meta property="og:type" content="website">
 
   <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <!-- Bulma + icons (Nerfies / robocurate template) -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet"
+        href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- MathJax -->
   <script>
@@ -32,173 +42,394 @@
 </head>
 <body>
 
-  <!-- Hero / Title -->
-  <header class="hero">
-    <div class="container">
-      <div class="venue-badge">
-        <span class="dot"></span>
-        Published as a conference paper at <strong>ICLR 2026</strong>
-      </div>
+<!-- =============================================================
+     1. Hero / Title
+     ============================================================= -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <div class="venue-badge">
+            Published as a conference paper at <strong>ICLR 2026</strong>
+          </div>
 
-      <h1 class="title">
-        Verifier-free Test-Time Sampling<br>
-        <span class="title-sub">for Vision-Language-Action Models</span>
-      </h1>
+          <h1 class="title is-1 publication-title">
+            Verifier-free Test-Time Sampling<br>
+            for Vision-Language-Action Models
+          </h1>
 
-      <div class="authors">
-        <span class="author"><a href="https://suhyeok-jang.github.io/" target="_blank" rel="noopener">Suhyeok Jang</a><sup>1</sup></span>
-        <span class="author">Dongyoung Kim<sup>1,3</sup></span>
-        <span class="author">Changyeon Kim<sup>1</sup></span>
-        <span class="author">Youngsuk Kim<sup>2</sup></span>
-        <span class="author">Jinwoo Shin<sup>1,3</sup></span>
-      </div>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://suhyeok-jang.github.io/" target="_blank" rel="noopener">Suhyeok Jang</a><sup>1</sup>,</span>
+            <span class="author-block">
+              <a href="https://kingdy2002.github.io/" target="_blank" rel="noopener">Dongyoung Kim</a><sup>1,3</sup>,</span>
+            <span class="author-block">
+              <a href="https://changyeon.site/" target="_blank" rel="noopener">Changyeon Kim</a><sup>1</sup>,</span>
+            <span class="author-block">
+              Youngsuk Kim<sup>2</sup>,</span>
+            <span class="author-block">
+              <a href="https://alinlab.kaist.ac.kr/shin.html" target="_blank" rel="noopener">Jinwoo Shin</a><sup>1,3</sup></span>
+          </div>
 
-      <div class="affiliations">
-        <span><sup>1</sup>KAIST</span>
-        <span><sup>2</sup>Seoul National University</span>
-        <span><sup>3</sup>RLWRLD</span>
-      </div>
+          <div class="is-size-5 publication-authors" style="margin-top:6px;">
+            <span class="author-block"><sup>1</sup>KAIST,</span>
+            <span class="author-block"><sup>2</sup>Seoul National University,</span>
+            <span class="author-block"><sup>3</sup>RLWRLD</span>
+          </div>
 
-      <nav class="action-buttons">
-        <a class="btn" href="https://arxiv.org/abs/2510.05681" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
-          Paper
-        </a>
-        <a class="btn" href="https://arxiv.org/abs/2510.05681" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M20.3 7.3l-3.6-3.6a1 1 0 00-.7-.3H5a2 2 0 00-2 2v16a2 2 0 002 2h14a2 2 0 002-2V8a1 1 0 00-.3-.7zM5 5h10v4h4v10H5V5z"/></svg>
-          arXiv
-        </a>
-        <a class="btn" href="https://github.com/suhyeok-jang/mg-select" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2a10 10 0 00-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.5 9.5 0 015 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0012 2z"/></svg>
-          Code
-        </a>
-        <a class="btn btn-disabled" href="#" onclick="event.preventDefault(); alert('Coming soon!');">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          BibTeX
-        </a>
-      </nav>
-    </div>
-
-    <div class="hero-decor" aria-hidden="true"></div>
-  </header>
-
-  <!-- Teaser -->
-  <section class="section teaser">
-    <div class="container narrow">
-      <figure class="teaser-figure">
-        <div class="placeholder-image">
-          <span class="placeholder-label">Figure 1 — Overview of MG-Select</span>
-          <span class="placeholder-hint">(Add static/images/teaser.png)</span>
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- Paper (OpenReview) -->
+              <span class="link-block">
+                <a href="https://openreview.net/forum?id=UD4Rw8MOEK" target="_blank" rel="noopener"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- arXiv -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2510.05681" target="_blank" rel="noopener"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="ai ai-arxiv"></i></span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+            </div>
+          </div>
         </div>
-        <figcaption>
-          <strong>Overview of MG-Select.</strong> An autoregressive VLA $\pi_\theta$ samples action tokens in parallel from the predicted distribution, while simultaneously computing token-wise KL divergence from the condition-masking distribution. Best-of-N selection is then performed using the aggregated confidence score $C_{\tilde{a}}$.
-        </figcaption>
-      </figure>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Abstract -->
-  <section class="section">
-    <div class="container narrow">
-      <h2 class="section-title">Abstract</h2>
-      <p class="lede">
-        Vision-Language-Action models (VLAs) have demonstrated remarkable performance in robot control. However, they remain fundamentally limited in tasks that require high precision due to their single-inference paradigm. While test-time scaling approaches using external verifiers have shown promise, they require additional training and fail to generalize to unseen conditions.
-      </p>
-      <p>
-        We propose <strong>Masking Distribution Guided Selection (MG-Select)</strong>, a novel test-time scaling framework for VLAs that leverages the model's internal properties <em>without</em> requiring additional training or external modules. Our approach utilizes KL divergence from a reference action token distribution as a confidence metric for selecting the optimal action from multiple candidates. We introduce a reference distribution generated by the same VLA but with randomly masked states and language conditions as inputs, providing action uncertainty while remaining aligned with the target task distribution.
-      </p>
-      <p>
-        Additionally, we propose a joint training strategy that enables the model to learn both conditional and unconditional distributions by applying dropout to state and language conditions, thereby further improving the quality of the reference distribution. Our experiments demonstrate that MG-Select provides a reliable reference for action selection through task-relevant condition masking and consistently improves base models across diverse simulation and real-world benchmarks.
-      </p>
+<!-- =============================================================
+     2. TL;DR (compact highlighted one-liner)
+     ============================================================= -->
+<section class="section tldr-section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div class="tldr-box">
+          <span class="tldr-tag">TL;DR</span>
+          <p>
+            We propose a <strong>masking distribution&#8209;guided</strong> test-time scaling method to improve the precision of VLAs in robotic manipulation.
+          </p>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Key Results Stats -->
-  <section class="section section-alt">
-    <div class="container">
-      <h2 class="section-title centered">Key Results</h2>
-      <div class="stats-grid">
+<!-- =============================================================
+     3. Abstract
+     ============================================================= -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Vision-Language-Action models (VLAs) excel at robot control but their <em>single-inference</em>, greedy-decoding paradigm bottlenecks high-precision manipulation. Existing test-time scaling approaches rely on <em>external verifiers</em> that require additional training and fail to generalize to unseen conditions.
+          </p>
+          <p>
+            We propose <span class="mgselect">Masking Distribution Guided Selection (MG-Select)</span>, a verifier-free test-time scaling framework that uses KL divergence from a <strong>condition-masking reference distribution</strong> — produced by the same VLA with randomly masked states and language conditions — as a Best-of-N confidence signal. A joint training strategy that applies dropout to state and language conditions further sharpens the reference at test time.
+          </p>
+          <p>
+            Our experiments demonstrate that <span class="mgselect">MG-Select</span> consistently improves state-of-the-art VLAs across diverse simulation and real-world pick-and-place benchmarks, <em>without any additional training or external module</em> at inference.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================
+     4. Key Results (3 headline stats)
+     ============================================================= -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Key Results</h2>
+        <p class="content" style="margin-bottom:2rem;">
+          <span class="mgselect">MG-Select</span> achieves substantial gains over greedy decoding across simulation and real-world benchmarks, without any external verifier.
+        </p>
+      </div>
+    </div>
+    <div class="columns is-centered is-multiline stats-row">
+      <div class="column is-4 has-text-centered">
         <div class="stat-card">
           <div class="stat-number">+168%</div>
-          <div class="stat-label">Relative gain on RoboCasa pick-and-place (30 demos)<br>5.3% → 14.2%</div>
+          <div class="stat-label">
+            Relative gain on RoboCasa pick-and-place<br>
+            (30 demos, 5.3% &rarr; 14.2%)
+          </div>
         </div>
+      </div>
+      <div class="column is-4 has-text-centered">
         <div class="stat-card">
           <div class="stat-number">+28%</div>
-          <div class="stat-label">Real-world in-distribution tasks<br>Franka Research 3</div>
+          <div class="stat-label">
+            Real-world in-distribution tasks<br>
+            Franka Research 3, 4 objects
+          </div>
         </div>
+      </div>
+      <div class="column is-4 has-text-centered">
         <div class="stat-card">
           <div class="stat-number">+35%</div>
-          <div class="stat-label">Real-world out-of-distribution tasks<br>Unseen objects</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">0</div>
-          <div class="stat-label">External verifiers required<br>Uses only the VLA itself</div>
+          <div class="stat-label">
+            Real-world out-of-distribution tasks<br>
+            Unseen objects
+          </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Method -->
-  <section class="section">
-    <div class="container narrow">
-      <h2 class="section-title">Method</h2>
+<!-- =============================================================
+     5. Method
+     ============================================================= -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 has-text-centered">Method</h2>
 
-      <h3 class="subsection-title">The Problem</h3>
-      <p>
-        VLAs fine-tuned on target tasks for next action token prediction often <em>memorize expert trajectories</em>, causing the probability distribution over action tokens to become overly concentrated. As a result, naive likelihood-based selection from multiple samples often converges to the same result and fails to improve precision.
-      </p>
-
-      <h3 class="subsection-title">Condition-Masking Distributional Confidence</h3>
-      <p>
-        We propose a confidence metric based on the KL divergence between the predicted distribution and a <strong>reference distribution that represents uncertainty</strong>. The reference is generated by the same VLA but with specific input modalities masked out — creating a distribution that approximates failure modes where essential conditions are ignored.
-      </p>
-
-      <div class="equation-block">
-        <div class="eq-row">
-          <span class="eq-label">Text-masking:</span>
-          <span class="eq-body">$\mathrm{KL}_{\text{text}} = \mathrm{KL}\big(\pi_\theta(\cdot \mid o_t, q_t, \varnothing, a_{&lt;i}) \,\|\, \pi_\theta(\cdot \mid o_t, q_t, I, a_{&lt;i})\big)$</span>
+        <!-- 5.1 Motivation -->
+        <div class="method-step">
+          <p class="step-title">1.&ensp;Motivation</p>
+          <div class="content has-text-justified">
+            <p>
+              VLAs have shown remarkable performance in robot control, yet they remain fundamentally limited on tasks that demand high precision &mdash; even after extensive pre-training, they often fail on fine-grained manipulation such as grasping or object placement. This precision gap is especially problematic for real-world applications where <em>millimeter-level accuracy</em> can decide task success.
+            </p>
+            <p>
+              A natural remedy, inspired by Test-Time Scaling (TTS) in LLMs, is <em>repeated sampling + Best-of-N selection</em>. Prior work pairs sampling with an <strong>external verifier</strong> trained via reinforcement learning on robotic data, which introduces two significant drawbacks: (i) it adds substantial training cost and deployment complexity, and (ii) the learned verifiers fail to generalize to unseen task prompts or objects, limiting broader applicability.
+            </p>
+            <p>
+              Our goal is therefore a TTS framework that leverages the <strong>model's internal properties</strong> &mdash; no extra training, no external modules.
+            </p>
+          </div>
         </div>
-        <div class="eq-row">
-          <span class="eq-label">State-masking:</span>
-          <span class="eq-body">$\mathrm{KL}_{\text{state}} = \mathrm{KL}\big(\pi_\theta(\cdot \mid o_t, \varnothing, I, a_{&lt;i}) \,\|\, \pi_\theta(\cdot \mid o_t, q_t, I, a_{&lt;i})\big)$</span>
+
+        <!-- 5.2 Condition-Masking Distributional Confidence -->
+        <div class="method-step">
+          <p class="step-title">2.&ensp;Condition-Masking Distributional Confidence</p>
+
+          <figure class="main-figure has-text-centered">
+            <div class="placeholder-image">
+              <span class="placeholder-label">Figure 1 — Overview of MG-Select</span>
+              <span class="placeholder-hint">(static/images/teaser.png)</span>
+            </div>
+            <figcaption class="figure-caption">
+              <strong>Overview of <span class="mgselect">MG-Select</span>.</strong> (1) An autoregressive VLA $\pi_\theta$ samples action tokens in parallel from the predicted distribution, while simultaneously computing token-wise KL divergence from the <em>condition-masking</em> distribution. (2) Best-of-N selection is performed using an action confidence score $C_{\tilde{a}}$ obtained by aggregating these token-wise scores.
+            </figcaption>
+          </figure>
+
+          <div class="content has-text-justified">
+            <p>
+              Naive likelihood-based Best-of-N often fails because VLAs fine-tuned on the target task produce <em>overly concentrated</em> action token distributions &mdash; multiple samples collapse to the same action. Instead, we compute a confidence score via the <strong>KL divergence</strong> between the predicted distribution and a <strong>reference distribution that represents uncertainty</strong>. Intuitively, actions that deviate most from an uncertainty-aware reference are the most confident.
+            </p>
+            <p>
+              We build that reference using the same VLA, but with specific input modalities masked &mdash; approximating failure modes where essential conditions are ignored. We consider three variants:
+            </p>
+            <div class="equation-block">
+              <div class="eq-row">
+                <span class="eq-label">Text-masking:</span>
+                <span class="eq-body">$\mathrm{KL}_{\text{text}} = \mathrm{KL}\big(\pi_\theta(\cdot \mid o_t, q_t, \varnothing, a_{&lt;i}) \,\|\, \pi_\theta(\cdot \mid o_t, q_t, I, a_{&lt;i})\big)$</span>
+              </div>
+              <div class="eq-row">
+                <span class="eq-label">State-masking:</span>
+                <span class="eq-body">$\mathrm{KL}_{\text{state}} = \mathrm{KL}\big(\pi_\theta(\cdot \mid o_t, \varnothing, I, a_{&lt;i}) \,\|\, \pi_\theta(\cdot \mid o_t, q_t, I, a_{&lt;i})\big)$</span>
+              </div>
+              <div class="eq-row">
+                <span class="eq-label">Both:</span>
+                <span class="eq-body">$\mathrm{KL}_{\text{both}} = \mathrm{KL}\big(\pi_\theta(\cdot \mid o_t, \varnothing, \varnothing, a_{&lt;i}) \,\|\, \pi_\theta(\cdot \mid o_t, q_t, I, a_{&lt;i})\big)$</span>
+              </div>
+            </div>
+            <p>
+              Token-wise KL is aggregated into an action-level confidence $C_{\tilde{a}} = \sum_{i \in \mathcal{I}} \mathrm{KL}(Q_i \,\|\, P_i)$, and the final action is selected via Best-of-N:
+            </p>
+            <div class="equation-center">
+              $a^{\*} = \arg\max_{\tilde{a}^{(n)} \in \tilde{\mathcal{A}}} C_{\tilde{a}^{(n)}}$
+            </div>
+            <p>
+              The optimal masking variant depends on the environment: <em>state-masking</em> works best on benchmarks that are single-task pick-and-place (e.g., SIMPLER-WidowX), while <em>text-masking</em> dominates on multi-task environments (e.g., RoboCasa) where instructions are indispensable.
+            </p>
+          </div>
         </div>
-        <div class="eq-row">
-          <span class="eq-label">Both:</span>
-          <span class="eq-body">$\mathrm{KL}_{\text{both}} = \mathrm{KL}\big(\pi_\theta(\cdot \mid o_t, \varnothing, \varnothing, a_{&lt;i}) \,\|\, \pi_\theta(\cdot \mid o_t, q_t, I, a_{&lt;i})\big)$</span>
+
+        <!-- 5.3 Joint Training Strategy -->
+        <div class="method-step">
+          <p class="step-title">3.&ensp;Joint Training Strategy</p>
+          <div class="content has-text-justified">
+            <p>
+              Standard VLAs are not trained to see masked inputs, so directly feeding a masked condition yields degenerate distributions. We augment fine-tuning with all four masking variants:
+            </p>
+            <div class="variant-list">
+              <span class="variant-chip">(i) all-condition $(q_t, I)$</span>
+              <span class="variant-chip">(ii) text-masking $(q_t, \varnothing)$</span>
+              <span class="variant-chip">(iii) state-masking $(\varnothing, I)$</span>
+              <span class="variant-chip">(iv) both-masking $(\varnothing, \varnothing)$</span>
+            </div>
+            <p>
+              Dropout over $q_t$ and $I$ is applied during training. The resulting VLA &mdash; denoted <strong><span class="mgselect">MG-Select</span>*</strong> &mdash; matches standard-fine-tuning performance <em>and</em> produces meaningful condition-masking references at test time, yielding a stronger confidence signal and further amplifying MG-Select's gains.
+            </p>
+          </div>
         </div>
       </div>
-
-      <p>
-        Actions that deviate most from this uncertainty-aware reference are likely to be the most confident and precise. We select the final action via Best-of-N:
-      </p>
-      <div class="equation-center">
-        $a^{*} = \arg\max_{\tilde{a}^{(n)} \in \tilde{\mathcal{A}}} C_{\tilde{a}^{(n)}}$
-      </div>
-
-      <h3 class="subsection-title">Joint Training Strategy</h3>
-      <p>
-        To ensure the VLA can produce meaningful condition-masking distributions at inference, we propose a joint fine-tuning scheme. We randomly drop the proprioceptive state $q_t$ and/or instruction $I$ (each 10%) during training, augmenting the dataset with four variants:
-      </p>
-      <div class="variant-list">
-        <span class="variant-chip">(i) all-condition $(q_t, I)$</span>
-        <span class="variant-chip">(ii) text-masking $(q_t, \varnothing)$</span>
-        <span class="variant-chip">(iii) state-masking $(\varnothing, I)$</span>
-        <span class="variant-chip">(iv) both-masking $(\varnothing, \varnothing)$</span>
-      </div>
-      <p>
-        This enables the VLA to maintain standard fine-tuning performance while gaining awareness of condition-masking distributions — yielding a stronger confidence signal at test time. We denote this enhanced variant as <strong>MG-Select*</strong>.
-      </p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Results -->
-  <section class="section section-alt">
-    <div class="container">
-      <h2 class="section-title centered">Experimental Results</h2>
+<!-- =============================================================
+     6. Qualitative Results (2-column × 2-row video grid)
+     ============================================================= -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Qualitative Results</h2>
+    <p class="content has-text-centered" style="max-width:760px; margin:0 auto 2rem;">
+      Real-world <em>"Box to Bowl"</em> task on the Franka Research 3. <span class="mgselect">MG-Select</span> produces high-precision actions at the <strong>critical moments</strong> &mdash; grasping and releasing &mdash; where the base policy often fails.
+    </p>
 
-      <div class="result-block">
-        <h3 class="subsection-title">RoboCasa — Pick-and-place precision</h3>
-        <p class="result-caption">Success rate (%) on RoboCasa across demonstration scales. MG-Select consistently improves the base model, with particularly strong gains in the low-data regime.</p>
+    <div class="qual-stage">
+
+      <!-- Column 1: Grasping -->
+      <div class="qual-col">
+        <div class="qual-header">Grasping sponge from box</div>
+
+        <div class="qual-row">
+          <div class="qual-sublabel">&pi;<sub>0</sub>-FAST-DROID (base model)</div>
+          <div class="qual-video">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="static/videos/grasp_base.mp4" type="video/mp4">
+              Your browser does not support video playback.
+            </video>
+          </div>
+        </div>
+
+        <div class="qual-row ours">
+          <div class="qual-sublabel">&pi;<sub>0</sub>-FAST-DROID + <span class="mgselect">Ours</span></div>
+          <div class="qual-video">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="static/videos/grasp_ours.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 2: Releasing -->
+      <div class="qual-col">
+        <div class="qual-header">Releasing sponge to bowl</div>
+
+        <div class="qual-row">
+          <div class="qual-sublabel">&pi;<sub>0</sub>-FAST-DROID (base model)</div>
+          <div class="qual-video">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="static/videos/release_base.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+
+        <div class="qual-row ours">
+          <div class="qual-sublabel">&pi;<sub>0</sub>-FAST-DROID + <span class="mgselect">Ours</span></div>
+          <div class="qual-video">
+            <video autoplay muted loop playsinline preload="metadata">
+              <source src="static/videos/release_ours.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <p class="qual-footnote">
+      Each clip shows a wide-view (left) and a wrist-camera close-up (right). Videos auto-play muted and loop.
+    </p>
+  </div>
+</section>
+
+<!-- =============================================================
+     7. Efficient Deployment (Figure 3 + Table 5(b))
+     ============================================================= -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 has-text-centered">Efficient Deployment</h2>
+        <div class="content has-text-justified">
+          <p>
+            Since <span class="mgselect">MG-Select</span> generates $N$ candidate actions in parallel, a naive implementation repeats the expensive <em>prefill</em> step $N$ times. This is particularly critical for VLAs, which re-prefill at every timestep to condition on the current observation.
+          </p>
+          <p>
+            We design a <strong>single-prefill deployment</strong> that shares one prefill across all $N$ candidates before decoding. With $N=4$, this gives a <strong>45% latency reduction</strong> compared to vanilla MG-Select &mdash; keeping inference time comparable to single-action inference across different candidate sizes.
+          </p>
+        </div>
+
+        <div class="efficiency-grid">
+          <!-- Left: Latency figure placeholder -->
+          <figure>
+            <div class="placeholder-image">
+              <span class="placeholder-label">Figure 3 — Inference latency on LIBERO-Object</span>
+              <span class="placeholder-hint">(static/images/latency.png)</span>
+            </div>
+            <figcaption class="figure-caption">
+              <span class="mgselect">MG-Select</span> + single prefill stays near-flat as $N$ grows, while vanilla <span class="mgselect">MG-Select</span> scales super-linearly.
+            </figcaption>
+          </figure>
+
+          <!-- Right: Table 5(b) — Number of candidates -->
+          <div>
+            <p class="result-caption"><strong>Table 5 (b)</strong> — Effect of candidate count $N$ on RoboCasa (100 demos). Gains saturate quickly: $N=4$ already captures most of the improvement.</p>
+            <div class="table-wrap">
+              <table class="results-table compact">
+                <thead>
+                  <tr>
+                    <th>$N$</th>
+                    <th>PnP</th>
+                    <th>All</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1</td><td>27.6</td><td>43.8</td></tr>
+                  <tr><td>2</td><td>30.0</td><td>46.2</td></tr>
+                  <tr class="highlight"><td><strong>4</strong></td><td><strong>31.0</strong></td><td><strong>48.1</strong></td></tr>
+                  <tr><td>8</td><td>30.0</td><td>46.9</td></tr>
+                  <tr><td>16</td><td>30.7</td><td>46.1</td></tr>
+                  <tr><td>32</td><td>31.0</td><td>46.6</td></tr>
+                  <tr><td>64</td><td>33.3</td><td>48.4</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================
+     8. Benchmark Results
+         (1) RoboCasa  (2) Real-World  (3) SIMPLER-WidowX  (4) CALVIN
+     ============================================================= -->
+<section class="section has-background-light">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Benchmark Results</h2>
+    <p class="content has-text-centered" style="margin-bottom:2rem; max-width:720px; margin-left:auto; margin-right:auto;">
+      <span class="mgselect">MG-Select</span> consistently improves state-of-the-art VLAs across <strong>simulation</strong>, <strong>real-world Franka experiments</strong>, a <strong>real-to-sim</strong> evaluation, and a <strong>long-horizon zero-shot</strong> benchmark &mdash; all without any external verifier.
+    </p>
+
+    <!-- (1) RoboCasa -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4">(1)&ensp;RoboCasa &mdash; pick-and-place precision</h3>
+        <p class="content has-text-justified" style="margin-bottom:1rem;">
+          24 atomic household kitchen tasks (including 8 pick-and-place) across 3 demonstration scales. <span class="mgselect">MG-Select</span>* produces the largest gains in the <strong>low-data regime</strong>: +168% relative at 30 demos on PnP.
+        </p>
         <div class="table-wrap">
           <table class="results-table">
             <thead>
@@ -222,19 +453,19 @@
                 <td>22.6</td><td>49.6</td>
               </tr>
               <tr>
-                <td>π₀-FAST†</td>
+                <td>&pi;<sub>0</sub>-FAST&dagger;</td>
                 <td>5.3</td><td>30.9</td>
                 <td>17.0</td><td>40.2</td>
                 <td>43.2</td><td>61.2</td>
               </tr>
               <tr>
-                <td>&nbsp;&nbsp;+ MG-Select</td>
+                <td>&nbsp;&nbsp;+ <span class="mgselect">MG-Select</span></td>
                 <td>7.2</td><td>32.0</td>
                 <td>22.6</td><td>43.7</td>
                 <td>46.5</td><td>61.3</td>
               </tr>
               <tr class="highlight">
-                <td>&nbsp;&nbsp;+ MG-Select*</td>
+                <td>&nbsp;&nbsp;+ <span class="mgselect">MG-Select</span>*</td>
                 <td><strong>14.2</strong></td><td><strong>34.6</strong></td>
                 <td><strong>31.0</strong></td><td><strong>48.1</strong></td>
                 <td><strong>46.9</strong></td><td><strong>62.9</strong></td>
@@ -243,156 +474,185 @@
           </table>
         </div>
       </div>
+    </div>
 
-      <div class="result-block">
-        <h3 class="subsection-title">Real-world — Franka Research 3</h3>
-        <p class="result-caption">In-distribution pick-and-place tasks with 4 different target objects. 24 trials per task.</p>
+    <!-- (2) Real-World -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4">(2)&ensp;Real-World &mdash; Franka Research 3</h3>
+        <p class="content has-text-justified" style="margin-bottom:1rem;">
+          We evaluate on a 7-DoF Franka arm using &pi;<sub>0</sub>-FAST-DROID as the base model, testing both <strong>in-distribution</strong> pick-and-place (4 seen objects) and <strong>out-of-distribution</strong> (unseen tape and cup) tasks.
+        </p>
+
+        <p class="result-caption"><strong>Table 4</strong> &mdash; In-distribution: multi-task training with 60 demonstrations per task. 24 trials (4 objects × 6 trials) per task.</p>
         <div class="table-wrap">
           <table class="results-table">
             <thead>
               <tr>
                 <th>Model</th>
-                <th>Box→Bowl</th>
-                <th>Box→Plate</th>
-                <th>Basket→Bowl</th>
-                <th>Plate→Basket</th>
+                <th>Box&rarr;Bowl</th>
+                <th>Box&rarr;Plate</th>
+                <th>Basket&rarr;Bowl</th>
+                <th>Plate&rarr;Basket</th>
                 <th>Avg.</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>π₀-FAST-DROID</td>
+                <td>&pi;<sub>0</sub>-FAST-DROID</td>
                 <td>41.7</td><td>37.5</td><td>45.8</td><td>25.0</td><td>37.5</td>
               </tr>
               <tr class="highlight">
-                <td>&nbsp;&nbsp;+ MG-Select*</td>
+                <td>&nbsp;&nbsp;+ <span class="mgselect">MG-Select</span>*</td>
                 <td><strong>58.3</strong></td><td><strong>54.2</strong></td><td><strong>50.0</strong></td><td><strong>29.2</strong></td><td><strong>47.9</strong></td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
 
-      <div class="result-block">
-        <h3 class="subsection-title">LIBERO — Multi-axis generalization</h3>
-        <p class="result-caption">MG-Select is architecture-agnostic: it improves both OpenVLA and π₀-FAST across LIBERO task suites.</p>
+        <p class="result-caption"><strong>Table 3</strong> &mdash; Out-of-distribution: unseen objects (16 trials per task).</p>
         <div class="table-wrap">
           <table class="results-table">
             <thead>
               <tr>
                 <th>Model</th>
-                <th>Spatial</th>
-                <th>Object</th>
-                <th>Goal</th>
-                <th>Long</th>
+                <th>Pick up Tape</th>
+                <th>Take Cup out of Bowl</th>
                 <th>Avg.</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>OpenVLA†</td>
-                <td><strong>85.0</strong></td><td>63.4</td><td><strong>75.6</strong></td><td>52.2</td><td>69.1</td>
+                <td>&pi;<sub>0</sub>-FAST-DROID</td>
+                <td>56.3</td><td>50.0</td><td>53.1</td>
               </tr>
               <tr class="highlight">
-                <td>&nbsp;&nbsp;+ MG-Select*</td>
-                <td>84.8</td><td><strong>72.3</strong></td><td>74.9</td><td><strong>54.7</strong></td><td><strong>71.7</strong></td>
-              </tr>
-              <tr>
-                <td>π₀-FAST†</td>
-                <td><strong>97.4</strong></td><td>95.4</td><td><strong>95.6</strong></td><td>79.6</td><td>92.0</td>
-              </tr>
-              <tr class="highlight">
-                <td>&nbsp;&nbsp;+ MG-Select*</td>
-                <td>97.2</td><td><strong>98.0</strong></td><td>94.5</td><td><strong>82.7</strong></td><td><strong>93.1</strong></td>
+                <td>&nbsp;&nbsp;+ <span class="mgselect">MG-Select</span></td>
+                <td><strong>68.8</strong></td><td><strong>75.0</strong></td><td><strong>71.9</strong></td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- Qualitative -->
-  <section class="section">
-    <div class="container narrow">
-      <h2 class="section-title">Qualitative Results</h2>
-      <p>
-        MG-Select improves the precision of the policy at critical moments — grasping and releasing — where the base model often fails.
-      </p>
-
-      <div class="qual-grid">
-        <figure>
-          <div class="placeholder-image small">
-            <span class="placeholder-label">Grasping a sponge from the box</span>
-            <span class="placeholder-hint">(static/images/qual_grasp.png)</span>
-          </div>
-          <figcaption>(a) π₀-FAST-DROID vs. π₀-FAST-DROID + MG-Select on the grasping phase.</figcaption>
-        </figure>
-        <figure>
-          <div class="placeholder-image small">
-            <span class="placeholder-label">Releasing a sponge to the bowl</span>
-            <span class="placeholder-hint">(static/images/qual_release.png)</span>
-          </div>
-          <figcaption>(b) Release phase: the base policy misses alignment, MG-Select completes the placement.</figcaption>
-        </figure>
-      </div>
-    </div>
-  </section>
-
-  <!-- Efficiency -->
-  <section class="section section-alt">
-    <div class="container narrow">
-      <h2 class="section-title">Efficient Deployment</h2>
-      <p>
-        We design a <strong>single-prefill deployment</strong> strategy that shares one prefill across all $N$ candidates before decoding. With $N=4$, this reduces inference latency by <strong>45%</strong> compared to vanilla MG-Select — keeping the inference time comparable to single-action inference across different candidate sizes.
-      </p>
-      <figure class="teaser-figure">
-        <div class="placeholder-image">
-          <span class="placeholder-label">Figure 3 — Inference latency on LIBERO-Object</span>
-          <span class="placeholder-hint">(static/images/latency.png)</span>
+    <!-- (3) SIMPLER-WidowX -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4">(3)&ensp;SIMPLER-WidowX &mdash; real-to-sim evaluation</h3>
+        <p class="content has-text-justified" style="margin-bottom:1rem;">
+          4 pick-and-place tasks in a real-to-sim setting. We train &pi;<sub>0</sub>-FAST on BridgeData V2 and evaluate on SIMPLER. <span class="mgselect">MG-Select</span>* improves average success rate from 46.9 to <strong>50.3</strong>, outperforming prior VLAs on average.
+        </p>
+        <div class="table-wrap">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Spoon on Towel</th>
+                <th>Carrot on Plate</th>
+                <th>Stack Cubes</th>
+                <th>Eggplant in Basket</th>
+                <th>Avg.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>RT-1-X</td><td>0.0</td><td>4.2</td><td>0.0</td><td>0.0</td><td>1.1</td></tr>
+              <tr><td>Octo</td><td>12.5</td><td>8.3</td><td>0.0</td><td>43.1</td><td>16.0</td></tr>
+              <tr><td>RoboVLM</td><td>29.2</td><td>25.0</td><td>12.5</td><td>58.3</td><td>31.3</td></tr>
+              <tr><td>SpatialVLA</td><td>16.7</td><td>25.0</td><td>29.2</td><td><strong>100.0</strong></td><td>42.7</td></tr>
+              <tr>
+                <td>&pi;<sub>0</sub>-FAST&dagger;</td>
+                <td>66.7</td><td>70.8</td><td>41.7</td><td>8.3</td><td>46.9</td>
+              </tr>
+              <tr class="highlight">
+                <td>&nbsp;&nbsp;+ <span class="mgselect">MG-Select</span>*</td>
+                <td><strong>69.4</strong></td><td><strong>75.0</strong></td><td><strong>43.1</strong></td><td>13.9</td><td><strong>50.3</strong></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <figcaption>
-          MG-Select + single prefill stays near-flat as $N$ grows, while vanilla MG-Select scales super-linearly.
-        </figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- BibTeX -->
-  <section class="section">
-    <div class="container narrow">
-      <h2 class="section-title">Citation</h2>
-      <div class="bibtex-wrap">
-        <button class="copy-btn" onclick="copyBibtex(this)" aria-label="Copy BibTeX">Copy</button>
-<pre id="bibtex">@inproceedings{jang2026mgselect,
-  title     = {Verifier-free Test-Time Sampling for Vision-Language-Action Models},
-  author    = {Jang, Suhyeok and Kim, Dongyoung and Kim, Changyeon and Kim, Youngsuk and Shin, Jinwoo},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2026}
-}</pre>
       </div>
     </div>
-  </section>
 
-  <!-- Acknowledgments -->
-  <section class="section section-alt">
-    <div class="container narrow">
-      <h2 class="section-title">Acknowledgments</h2>
-      <p class="ack">
-        This work was supported by Institute of Information &amp; communications Technology Planning &amp; Evaluation (IITP) grant funded by the Korea government (MSIT) (RS-2019-II190075, Artificial Intelligence Graduate School Program (KAIST); RS-2024-00509279, Global AI Frontier Lab; RS-2025-02653113, High-Performance Research AI Computing Infrastructure Support at the 2 PFLOPS Scale). We are grateful to <strong>RLWRLD Inc.</strong> for generously providing compute resources and support for the real-world experiments conducted in this work.
-      </p>
+    <!-- (4) CALVIN -->
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h3 class="title is-4">(4)&ensp;CALVIN &mdash; long-horizon zero-shot generalization</h3>
+        <p class="content has-text-justified" style="margin-bottom:1rem;">
+          CALVIN evaluates <strong>long-horizon, multi-step planning</strong> on a Franka Panda arm across 34 language-conditioned tasks. We train &pi;<sub>0</sub>-FAST on environments A/B/C and <em>zero-shot</em> evaluate on the novel environment D (ABC&rarr;D), running 1,000 instruction chains. <span class="mgselect">MG-Select</span>* improves success at every chain depth, yielding a higher average chain length (3.69 &rarr; <strong>3.86</strong>).
+        </p>
+        <div class="table-wrap">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Model</th>
+                <th rowspan="2">Task</th>
+                <th colspan="5">Tasks Completed in a Row (%)</th>
+                <th rowspan="2">Avg. Len (&uarr;)</th>
+              </tr>
+              <tr>
+                <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>&pi;<sub>0</sub>-FAST&dagger;</td>
+                <td>ABC&rarr;D</td>
+                <td>96.0</td><td>85.8</td><td>74.4</td><td>62.4</td><td>50.6</td>
+                <td>3.69</td>
+              </tr>
+              <tr class="highlight">
+                <td>&nbsp;&nbsp;+ <span class="mgselect">MG-Select</span>*</td>
+                <td>ABC&rarr;D</td>
+                <td><strong>96.9</strong></td><td><strong>88.0</strong></td><td><strong>77.8</strong></td><td><strong>67.6</strong></td><td><strong>55.8</strong></td>
+                <td><strong>3.86</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer class="footer">
-    <div class="container">
-      <p>
-        Website template inspired by academic project pages. Source code available on
-        <a href="https://github.com/suhyeok-jang/mg-select" target="_blank" rel="noopener">GitHub</a>.
-      </p>
+<!-- =============================================================
+     9. BibTeX
+     ============================================================= -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">BibTeX</h2>
+        <div class="bibtex-wrap">
+          <button class="copy-btn" onclick="copyBibtex(this)" aria-label="Copy BibTeX">Copy</button>
+<pre id="bibtex">@inproceedings{jang2026verifierfree,
+  title     = {Verifier-free Test-Time Sampling for Vision-Language-Action Models},
+  author    = {Suhyeok Jang and Dongyoung Kim and Changyeon Kim and Youngsuk Kim and Jinwoo Shin},
+  booktitle = {The Fourteenth International Conference on Learning Representations},
+  year      = {2026},
+  url       = {https://openreview.net/forum?id=UD4Rw8MOEK}
+}</pre>
+        </div>
+      </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <script src="static/js/main.js"></script>
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content" style="text-align:center;">
+          <p>
+            Template based on the <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" rel="noopener">Nerfies</a> project page (CC BY-SA 4.0).
+            Source code: <a href="https://github.com/suhyeok-jang/mg-select" target="_blank" rel="noopener">GitHub</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="static/js/main.js"></script>
 </body>
 </html>
