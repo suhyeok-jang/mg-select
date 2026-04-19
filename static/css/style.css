@@ -247,27 +247,37 @@ body {
   font-size: 0.95rem;
 }
 .eq-row {
-  margin: 0.8rem 0;
-  display: block;  /* stack label above equation */
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.3rem;
+  align-items: center;
+  margin: 0.7rem 0;
 }
 .eq-label {
-  display: block;
   font-weight: 600;
   color: #2c7a7b;
   font-family: 'Google Sans', sans-serif;
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  text-align: right;
 }
 .eq-body {
-  display: block;
-  width: 100%;
   overflow: visible !important;
-  text-align: center;
+  text-align: left;
 }
 .eq-body mjx-container,
 .eq-body mjx-container svg {
   max-width: 100% !important;
   overflow: visible !important;
+}
+@media (max-width: 640px) {
+  .eq-row {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+  .eq-label {
+    text-align: left;
+  }
 }
 .equation-center {
   text-align: center;
