@@ -26,16 +26,16 @@ body {
 
 /* ── Hero / title block ─────────────────────────────────────── */
 .venue-badge {
-  display: inline-block;
-  padding: 0.55rem 1.3rem;
-  margin-bottom: 1.75rem;
-  font-size: 1.05rem;
-  border-radius: 999px;
-  background: #eaf5f5;
-  color: #1f4f50;
-  font-family: 'Google Sans', sans-serif;
-  letter-spacing: 0.02em;
-  border: 1px solid #c3dddd;
+  display: inline-block !important;
+  padding: 0.75rem 1.8rem !important;
+  margin-bottom: 2rem !important;
+  font-size: 1.3rem !important;
+  border-radius: 999px !important;
+  background: #eaf5f5 !important;
+  color: #1f4f50 !important;
+  font-family: 'Google Sans', sans-serif !important;
+  letter-spacing: 0.02em !important;
+  border: 1.5px solid #c3dddd !important;
 }
 .venue-badge strong {
   color: #2c7a7b;
@@ -78,12 +78,13 @@ body {
 
 /* Reduce hero bottom padding so TL;DR sits closer */
 .hero-tight .hero-body {
-  padding-bottom: 1.5rem;
+  padding-bottom: 0.5rem !important;
 }
 
 /* ── TL;DR box ──────────────────────────────────────────────── */
 .tldr-section {
-  padding: 0.5rem 1.5rem 2rem;  /* tight against Hero above */
+  padding: 0 1.5rem 2rem !important;
+  margin-top: -2rem !important;  /* pull TL;DR up closer to buttons */
 }
 .tldr-box {
   background: linear-gradient(135deg, #f0f7f7 0%, #fafbfc 100%);
@@ -120,7 +121,7 @@ body {
 }
 .teaser-img {
   width: 100%;
-  max-width: 960px;
+  max-width: 1200px;
   height: auto;
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
@@ -247,23 +248,27 @@ body {
   font-size: 0.95rem;
 }
 .eq-row {
-  margin: 0.35rem 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  align-items: baseline;
+  margin: 0.8rem 0;
+  display: block;  /* stack label above equation */
 }
 .eq-label {
+  display: block;
   font-weight: 600;
   color: #2c7a7b;
-  white-space: nowrap;
   font-family: 'Google Sans', sans-serif;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
 }
 .eq-body {
-  flex: 1;
-  min-width: 0;
-  overflow-x: visible;
+  display: block;
+  width: 100%;
+  overflow: visible !important;
+  text-align: center;
+}
+.eq-body mjx-container,
+.eq-body mjx-container svg {
+  max-width: 100% !important;
+  overflow: visible !important;
 }
 .equation-center {
   text-align: center;
