@@ -127,7 +127,7 @@
      ============================================================= -->
 <section class="section teaser-section">
   <div class="container is-max-desktop has-text-centered">
-    <img src="static/images/teaser.png"
+  <img src="static/images/overview.png"
          alt="Overview of MG-Select"
          class="teaser-img">
   </div>
@@ -174,9 +174,7 @@
       <div class="column is-4 has-text-centered">
         <div class="stat-card">
           <div class="stat-number">+168%</div>
-          <div class="stat-label">
-            Relative gain on RoboCasa pick-and-place<br>
-            (30 demos, 5.3% &rarr; 14.2%)
+          <div class="stat-label">RoboCasa pick-and-place (30 demos)</div>
           </div>
         </div>
       </div>
@@ -368,7 +366,7 @@
         <div class="efficiency-grid">
           <!-- Left: Latency figure -->
           <figure>
-            <img src="static/images/latency.png"
+          <img src="static/images/prefill_optimization.png"
                  alt="Inference latency comparison on LIBERO-Object"
                  class="fig-img">
             <figcaption class="figure-caption">
@@ -422,8 +420,8 @@
       <div class="column is-four-fifths">
         <h3 class="title is-4">(1)&ensp;RoboCasa, pick-and-place precision</h3>
         <p class="content has-text-justified bench-caption">
-          <strong>Setup.</strong> 8 pick-and-place tasks (of 24 kitchen tasks), trained with 30, 100, and 300 demonstrations.<br>
-          <strong>Effect.</strong> <span class="mgselect">MG-Select</span>* yields the largest gains in the low-data regime, +168% relative on PnP at 30 demos.
+          <strong>Setup :</strong> 8 pick-and-place tasks (of 24 kitchen tasks), trained with 30, 100, and 300 demonstrations.<br>
+          <strong>Effect :</strong> <span class="mgselect">MG-Select</span>* yields the largest gains in the low-data regime, +168% relative on PnP at 30 demos.
         </p>
         <div class="table-wrap">
           <table class="results-table">
@@ -477,8 +475,8 @@
       <div class="column is-four-fifths">
         <h3 class="title is-4">(2)&ensp;Real-World, Franka Research 3</h3>
         <p class="content has-text-justified bench-caption">
-          <strong>Setup.</strong> 7-DoF Franka arm with &pi;<sub>0</sub>-FAST-DROID, tested on in-distribution (seen objects) and out-of-distribution (unseen objects) pick-and-place tasks.<br>
-          <strong>Effect.</strong> <span class="mgselect">MG-Select</span>* gives +28% on ID tasks and +35% on OOD tasks, confirming real-world gains beyond simulation.
+          <strong>Setup :</strong> 7-DoF Franka arm with &pi;<sub>0</sub>-FAST-DROID, tested on in-distribution (seen objects) and out-of-distribution (unseen objects) pick-and-place tasks.<br>
+          <strong>Effect :</strong> <span class="mgselect">MG-Select</span>* gives +28% on ID tasks and +35% on OOD tasks, confirming real-world gains beyond simulation.
         </p>
 
         <p class="result-caption"><strong>Table 4.</strong> In-distribution: 60 demos per task, 24 trials (4 objects × 6 trials) per task.</p>
@@ -539,8 +537,8 @@
       <div class="column is-four-fifths">
         <h3 class="title is-4">(3)&ensp;SIMPLER-WidowX, real-to-sim evaluation</h3>
         <p class="content has-text-justified bench-caption">
-          <strong>Setup.</strong> &pi;<sub>0</sub>-FAST trained on BridgeData V2, evaluated on 4 SIMPLER pick-and-place tasks in a real-to-sim setting.<br>
-          <strong>Effect.</strong> <span class="mgselect">MG-Select</span>* raises average success from 46.9 to <strong>50.3</strong>, the highest among all compared VLAs.
+          <strong>Setup :</strong> &pi;<sub>0</sub>-FAST trained on BridgeData V2, evaluated on 4 SIMPLER pick-and-place tasks in a real-to-sim setting.<br>
+          <strong>Effect :</strong> <span class="mgselect">MG-Select</span>* raises average success from 46.9 to <strong>50.3</strong>, the highest among all compared VLAs.
         </p>
         <div class="table-wrap">
           <table class="results-table">
@@ -579,8 +577,8 @@
       <div class="column is-four-fifths">
         <h3 class="title is-4">(4)&ensp;CALVIN, long-horizon zero-shot generalization</h3>
         <p class="content has-text-justified bench-caption">
-          <strong>Setup.</strong> &pi;<sub>0</sub>-FAST trained on environments A, B, and C, zero-shot evaluated on novel environment D (ABC&rarr;D) over 1,000 instruction chains across 34 tasks.<br>
-          <strong>Effect.</strong> <span class="mgselect">MG-Select</span>* improves success at every chain depth (1&ndash;5 steps), raising average chain length from 3.69 to <strong>3.86</strong>.
+          <strong>Setup :</strong> &pi;<sub>0</sub>-FAST trained on environments A, B, and C, zero-shot evaluated on novel environment D (ABC&rarr;D) over 1,000 instruction chains across 34 tasks.<br>
+          <strong>Effect :</strong> <span class="mgselect">MG-Select</span>* improves success at every chain depth (1&ndash;5 steps), raising average chain length from 3.69 to <strong>3.86</strong>.
         </p>
         <div class="table-wrap">
           <table class="results-table">
